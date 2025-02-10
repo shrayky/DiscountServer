@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+	<Product Id="*"
+             Name="DiscountServer"
+             Language="1033"
+             Version="1.0.0.0"
+             Manufacturer="Automation"
+             UpgradeCode="D08BB596-62A5-4224-ACAB-A48BDF9F339F"
+             Codepage="65001">
+
+		<Package InstallerVersion="200"
+                 Compressed="yes"
+                 InstallScope="perMachine" />
+
+		<MediaTemplate />
+
+		<!-- Включаем логирование -->
+		<Property Id="MsiLogging" Value="voicewarmup" />
+
+		<!-- Скрипт для проверки службы -->
+		<Binary Id="CheckServiceCA" SourceFile="CheckService.vbs"/>
+
+		<CustomAction Id="CheckService"
+                     BinaryKey="CheckServiceCA"
+                     VBScriptCall="CheckService"
+                     Execute="deferred"
+                     Impersonate="no"
+                     Return="ignore"/>
+
+		<!-- Запускаем после установки службы, но до InstallFinalize -->
+		<InstallExecuteSequence>
+			<Custom Action="CheckService" After="StartServices">NOT Installed</Custom>
+		</InstallExecuteSequence>
+
+		<Feature Id="ProductFeature" Title="DS.DiscountServer" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="AutomationFolder" Name="Automation">
+					<Directory Id="DiscountServerFolder" Name="DiscountServer" />
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<ComponentGroup Id="ProductComponents" Directory="DiscountServerFolder">
+			<Component Id="MyService.exe" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567890">
+				<File Source="D:\DesignSharpC\DiscountServer\Setup\build-x86\discountService.exe"
+                      KeyPath="yes"/>
+				<ServiceInstall
+                    Id="DiscountServiceInstaller"
+                    Type="ownProcess"
+                    Name="DiscountService"
+                    DisplayName="DS: Discount service"
+                    Description="Служба реализует api frontol discount unit"
+                    Start="auto"
+                    Account="LocalSystem"
+                    ErrorControl="normal" />
+				<ServiceControl
+                    Id="StartDiscountService"
+                    Name="DiscountService"
+                    Start="install"
+                    Stop="both"
+                    Remove="uninstall"
+                    Wait="yes" />
+			</Component>
+		</ComponentGroup>
+	</Product>
+</Wix>
