@@ -7,5 +7,6 @@
         public LoggingSettings LoggingConfig { get; set; } = new();
         public Database Database { get; set; } = new();
         public Exchange Exchange { get; set; } = new();
+        public List<CardAutoRegistrationCondition> CardAutoRegistrationConditions { get; set; } = [];
     }
 }

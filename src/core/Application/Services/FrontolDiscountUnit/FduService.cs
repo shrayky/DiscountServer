@@ -62,6 +62,11 @@
 
                 // Если по телефону не нашли, ищем по карте
                 var card = await _cardService.ByIdAsync(identifier);
+
+                if (card == null)
+                    card = await _cardService.CreateNewCardFromPos(identifier);
+
+
                 return card?.ClientId;
             }
         }

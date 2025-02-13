@@ -6,6 +6,6 @@ namespace Application.Services.ClientService.Interfaces
     {
         Task<Card> ByIdAsync(string id);
         Task<bool> CreateCardAsync(Card card);
+        Task<Card?> CreateNewCardFromPos(string cardNumber);
     }
-
 }

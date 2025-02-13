@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Configuration.Migrations;
 using Microsoft.Extensions.Logging;
 using Shared;
 using Shared.Configuration;
@@ -66,7 +67,15 @@ namespace Configuration
         {
             string jsonContent = File.ReadAllText(_configPath);
 
-            return JsonSerializer.Deserialize<AppSettings>(jsonContent) ?? new();
+            var configuration = JsonSerializer.Deserialize<AppSettings>(jsonContent) ?? new();
+
+            if (configuration.Information.AppVersion == 1)
+            {
+                configuration = To2.DoMigration(configuration);
+                SaveConfiguration(configuration);
+            }
+
+            return configuration;
         }
 
         private void CacheSettings(AppSettings settings)

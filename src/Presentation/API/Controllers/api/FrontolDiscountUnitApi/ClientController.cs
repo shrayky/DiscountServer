@@ -20,6 +20,7 @@ namespace API.Controllers.api.FrontolDiscountUnitApi
         public async Task<IActionResult> ClientDataAsync(string identifier)
         {
             var client = await _fduService.GetClientByIdentifierAsync(identifier);
+
             if (client == null)
                 return NotFound();
 

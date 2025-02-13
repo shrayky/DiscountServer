@@ -21,7 +21,9 @@ namespace API.Extensions
             var certPath = Path.Combine(AppContext.BaseDirectory, "selfsigned.pfx");
             var certPassword = "12345678";
 
-            builder.WebHost.UseUrls($"https://+:{serverConfig.ApiIpPort}");
+            builder.WebHost.UseUrls(
+                $"https://+:{serverConfig.ApiSecureIpPort}",
+                $"http://+:{serverConfig.ApiIpPort}");
 
             X509Certificate2 cert = CertificateManager.GetCertificate(certPath, certPassword);
 
@@ -30,6 +32,13 @@ namespace API.Extensions
                 serverOptions.ConfigureHttpsDefaults(httpsOptions =>
                 {
                     httpsOptions.ServerCertificate = cert;
+                });
+                serverOptions.ConfigureEndpointDefaults(options =>
+                {
+                    if (Environment.OSVersion.Version.Major < 10)
+                    {
+                        options.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1;
+                    }
                 });
             });
 

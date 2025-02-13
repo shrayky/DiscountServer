@@ -20,14 +20,14 @@ namespace CouchDb.Repositories
 
         public async Task<Client?> ByIdAsync(string id) => await GetByIdAsync(id);
 
-        public async Task<Client> ByPhoneAsync(string phone)
+        public async Task<Client?> ByPhoneAsync(string phone)
         {
             var result = await Database
                     .UseIndex("phone_index")
                     .Where(c => c.Data.Phone == phone)
                     .FirstOrDefaultAsync();
 
-            return result.ToDomain()!;
+            return result?.ToDomain()!;
         }
 
         public async Task<bool> DeleteAsync(string id)
